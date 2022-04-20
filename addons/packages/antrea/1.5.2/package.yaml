@@ -1,0 +1,127 @@
+apiVersion: data.packaging.carvel.dev/v1alpha1
+kind: Package
+metadata:
+  name: antrea.community.tanzu.vmware.com.1.5.2
+spec:
+  refName: antrea.community.tanzu.vmware.com
+  version: 1.5.2
+  releaseNotes: relevant release notes...
+  licenses:
+  - UNKNOWN
+  template:
+    spec:
+      fetch:
+      - imgpkgBundle:
+          image: null
+      template:
+      - ytt:
+          paths:
+          - config/
+      - kbld:
+          paths:
+          - '-'
+          - .imgpkg/images.yml
+      deploy:
+      - kapp: {}
+  valuesSchema:
+    openAPIv3:
+      type: object
+      additionalProperties: false
+      description: OpenAPIv3 Schema for antrea
+      properties:
+        infraProvider:
+          type: string
+          description: The cloud provider in use. One of the following options => aws, azure, vsphere, docker
+          default: vsphere
+        antrea:
+          type: object
+          additionalProperties: false
+          properties:
+            config:
+              type: object
+              additionalProperties: false
+              description: Configuration for antrea
+              properties:
+                serviceCIDR:
+                  type: string
+                  description: ClusterIP CIDR range for IPv4 Services
+                  default: 10.96.0.0/12
+                serviceCIDRv6:
+                  type: string
+                  nullable: true
+                  description: ClusterIP CIDR range for IPv6 Services
+                  default: null
+                trafficEncapMode:
+                  type: string
+                  description: The traffic encapsulation mode. One of the following options => encap, noEncap, hybrid, networkPolicyOnly
+                  default: encap
+                noSNAT:
+                  type: boolean
+                  description: Flag to enable/disable SNAT for the egress traffic from a Pod to the external network
+                  default: false
+                disableUdpTunnelOffload:
+                  type: boolean
+                  description: Disable UDP tunnel offload feature on default NIC
+                  default: false
+                defaultMTU:
+                  type: string
+                  nullable: true
+                  description: Default MTU to use for the host gateway interface and the network interface of each Pod
+                  default: null
+                tlsCipherSuites:
+                  type: string
+                  description: List of allowed cipher suites. If omitted, the default Go Cipher Suites will be used
+                  default: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384
+                featureGates:
+                  type: object
+                  additionalProperties: false
+                  description: FeatureGates is a map of feature names to flags that enable or disable experimental features
+                  properties:
+                    AntreaProxy:
+                      type: boolean
+                      description: Flag to enable/disable antrea proxy
+                      default: false
+                    EndpointSlice:
+                      type: boolean
+                      description: Flag to enable/disable EndpointSlice support in AntreaProxy. If AntreaProxy is not enabled, this flag will not take effect
+                      default: false
+                    AntreaTraceflow:
+                      type: boolean
+                      description: Flag to enable/disable antrea traceflow
+                      default: false
+                    NodePortLocal:
+                      type: boolean
+                      description: Flag to enable/disable NodePortLocal feature to make the pods reachable externally through NodePort
+                      default: false
+                    AntreaPolicy:
+                      type: boolean
+                      description: Flag to enable/disable antrea policy
+                      default: true
+                    FlowExporter:
+                      type: boolean
+                      description: Flag to enable/disable flow exporter
+                      default: false
+                    NetworkPolicyStats:
+                      type: boolean
+                      description: Flag to enable/disable network policy stats
+                      default: false
+                    Egress:
+                      type: boolean
+                      description: Flag to enable/disable SNAT IPs of Pod egress traffic
+                      default: false
+                    NodeIPAM:
+                      type: boolean
+                      description: Flag to enable/disable node IPAM controller
+                      default: false
+                    AntreaIPAM:
+                      type: boolean
+                      description: Flag to enable/disable flexible IPAM mode
+                      default: false
+                    ServiceExternalIP:
+                      type: boolean
+                      description: Flag to enable/disable managing external IPs for Load balancers services
+                      default: false
+                    Multicast:
+                      type: boolean
+                      description: Flag to enable/disable multicast traffic
+                      default: false
